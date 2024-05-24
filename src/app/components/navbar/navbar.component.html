@@ -10,16 +10,20 @@
         <a mat-button routerLink="/contact">Contact</a>
     </span>
     <span class="navbar-right">
-        <button mat-icon-button [matMenuTriggerFor]="menu">
-            <mat-icon>account_circle</mat-icon>
-        </button>
-        <div>
+        <div *ngIf="isLoggedIn(); else login">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>account_circle</mat-icon>
+            </button>
             <mat-menu #menu="matMenu">
+                <span mat-menu-item>Welcome {{ username | uppercase}}</span>
                 <button mat-menu-item (click)="logout()">
                     <mat-icon>logout</mat-icon>
                     <span>Logout</span>
                 </button>
             </mat-menu>
         </div>
+        <ng-template #login>
+            <a mat-button routerLink="/login">Login</a>
+        </ng-template>
     </span>
 </mat-toolbar>

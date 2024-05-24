@@ -7,7 +7,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { PersonsComponent } from './pages/persons/persons.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http'
+import { HTTP_INTERCEPTORS, HttpClientModule, HttpClientXsrfModule } from '@angular/common/http'
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { RouterOutlet } from '@angular/router';
 import { HttpXSRFInterceptor } from './interceptors/http.csrf.interceptor';
@@ -23,6 +23,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { environment } from '../environments/environment';
 import { LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { LoginComponent } from './pages/login/login.component';
+import { AppAuthService } from './services/app.auth.service';
 
 export const authConfig: AuthConfig = {
   issuer: 'http://localhost:8080/realms/ILV',
@@ -48,7 +50,8 @@ export function storageFactory(): OAuthStorage {
     AppComponent,
     PersonsComponent,
     Page1Component,
-    NavbarComponent
+    NavbarComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -56,6 +59,10 @@ export function storageFactory(): OAuthStorage {
     RouterOutlet,
     AppRoutingModule,
     HttpClientModule,
+    HttpClientXsrfModule.withOptions({
+      cookieName: 'XSRF-TOKEN',
+      headerName: 'X-XSRF-TOKEN'
+    }),
     OAuthModule.forRoot({ resourceServer: { sendAccessToken: true } }),
     MatTableModule,
     MatFormFieldModule,
@@ -77,4 +84,8 @@ export function storageFactory(): OAuthStorage {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(private authService: AppAuthService) {
+    authService.initAuth().finally();
+  }
+}
